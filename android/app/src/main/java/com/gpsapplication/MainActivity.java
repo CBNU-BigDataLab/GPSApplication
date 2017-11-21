@@ -1,7 +1,6 @@
 package com.gpsapplication;
 
 import com.facebook.react.ReactActivity;
-import com.syarul.rnlocation.RNLocation;  // <--- import
 
 public class MainActivity extends ReactActivity {
 
@@ -12,25 +11,5 @@ public class MainActivity extends ReactActivity {
     @Override
     protected String getMainComponentName() {
         return "GPSApplication";
-    }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-      super.onCreate(savedInstanceState);
-      mReactRootView = new ReactRootView(this);
-
-      mReactInstanceManager = ReactInstanceManager.builder()
-        .setApplication(getApplication())
-        .setBundleAssetName("index.android.bundle")
-        .setJSMainModuleName("index.android")
-        .addPackage(new MainReactPackage())
-        .addPackage(new RNLocation()) // <-- Register package here
-        .setUseDeveloperSupport(BuildConfig.DEBUG)
-        .setInitialLifecycleState(LifecycleState.RESUMED)
-        .build();
-
-      mReactRootView.startReactApplication(mReactInstanceManager, "example", null);
-
-      setContentView(mReactRootView);
     }
 }
