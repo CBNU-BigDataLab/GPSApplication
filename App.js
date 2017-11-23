@@ -10,7 +10,8 @@ import {
   StyleSheet,
   Text,
   View,
-  Dimensions
+  Dimensions,
+  Alert
 } from 'react-native';
 
 import MapView, {PROVIDER_GOOGLE} from 'react-native-maps';
@@ -24,6 +25,8 @@ const instructions = Platform.select({
 
 const {width, height} = Dimensions.get('window');
 
+// X==> 36.61487315
+// Y==> 127.45870113
 const SCREEN_HEIGHT = height;
 const SCREEN_WIDTH = width;
 const ASPECT_RATIO = width / height;
@@ -41,7 +44,10 @@ export default class App extends Component<{}> {
         latitude: 0,
         longitude: 0,
         latitudeDelta: 0,
-        longitudeDelta: 0
+        longitudeDelta: 0,
+        speed: 0,
+        heading: 0,
+        acuuracy: 0
       },
       markerPoisition: {
         latitude: 0,
@@ -73,26 +79,32 @@ export default class App extends Component<{}> {
       this.setState({initialPosition: initialRegion})
       this.setState({markerPoisition: initialRegion})
     },
-    (error) => console.log(JSON.stringify(error)),
-    {enableHighAccuracy: false, timeout: 20000, maximumAge: 1000})
+    (error) => Alert.alert(JSON.stringify(error))
+  )
 
     this.watchID = navigator.geolocation.watchPosition((position) => {
-      console.log(position)
+      console.log("CHANGE POSITION ==> ", position)
       const lat = parseFloat(position.coords.latitude)
       const long = parseFloat(position.coords.longitude)
+      const speed = parseFloat(position.coords.speed)
+      const heading = parseFloat(position.coords.heading)
+      const accuracy = parseFloat(position.coords.accuracy)
 
-      const  lastRegion = {
+      const lastRegion = {
         latitude: lat,
         longitude: long,
-        latitudeDelta: LATITUDE_DELTA,
-        longitudeDelta: LONGITUDE_DELTA
+        latitudeDelta: 0.001,
+        longitudeDelta: 0.001,
+        speed: speed,
+        heading: heading,
+        accuracy: accuracy
       }
 
       this.setState({initialPosition: lastRegion})
       this.setState({markerPoisition: lastRegion})
     },
-    (error) => console.log(JSON.stringify(error)),
-    {enableHighAccuracy: false, timeout: 20000, maximumAge: 1000})
+    (error) => Alert.alert(JSON.stringify(error)),
+    {enableHighAccuracy: true, timeout: 20000, maximumAge: 0, distanceFilter: 1})
   }
 
   componentWillUnmount() {
@@ -125,6 +137,10 @@ export default class App extends Component<{}> {
         <MapView
           provider={PROVIDER_GOOGLE}
           style={styles.map}
+          showsUserLocation ={true}
+          rotateEnabled = {true}
+          zoomEnabled = {true}
+          showsMyLocationButton = {true}
           region={this.state.initialPosition}>
           <MapView.Marker
             coordinate={this.state.markerPoisition}>
@@ -136,6 +152,9 @@ export default class App extends Component<{}> {
         </MapView>
         <Text>Latitude: {this.state.initialPosition.latitude}</Text>
         <Text>Longitude: {this.state.initialPosition.longitude}</Text>
+        <Text>Accuracy: {this.state.initialPosition.accuracy}</Text>
+        <Text>Speed: {this.state.initialPosition.speed}</Text>
+        <Text>Heading: {this.state.initialPosition.heading}</Text>
       </View>
     );
   }
